@@ -1,0 +1,9 @@
+.idea
+.vscode
+
+cmake-build-debug
+build
+*.egg-info
+dist
+
+external/*
