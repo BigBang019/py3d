@@ -39,7 +39,20 @@ void logger(std::string vars, Args&&... values) {
     (..., (std::cout << delim << values, delim = ", "));
     std::cout << std::endl;
 }
-//#define DEBUG(x) do { std::cout << #x << "=" << x; } while (0)
+
+#define CONDITION_DEBUG(...) ConditionLogger(#__VA_ARGS__, __VA_ARGS__)
+template<typename ...Args>
+void ConditionLogger(std::string vars, Args&&... values) {
+    bool condition = std::get<0>(std::forward_as_tuple(values...));
+    if (condition) {
+        std::cout << vars << " = ";
+        std::string delim = "";
+        (..., (std::cout << delim << values, delim = ", "));
+        std::cout << std::endl;
+    }
+}
+
+#define ERROR(x) std::cerr << x << std::endl;
 
 
 #ifndef defer

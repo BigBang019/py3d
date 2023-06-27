@@ -52,8 +52,7 @@ MACRO(SUBDIRLIST result abs_cur_dir)
 ENDMACRO()
 
 ######### ADD C++ #########
-SUBDIRLIST(SRC ${CMAKE_SOURCE_DIR}/src)
-include_directories(${SRC})
+include_directories(src)
 FILE(GLOB SRC_LIB ${CMAKE_SOURCE_DIR}/src/*/*.cu ${CMAKE_SOURCE_DIR}/src/*/*.cpp)
 
 ######### ADD Wrapper #########

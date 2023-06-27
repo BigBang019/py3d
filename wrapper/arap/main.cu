@@ -3,7 +3,7 @@
 //
 #include "core/cuda_utils.h"
 #include "core/utils.h"
-#include "laplacian_smoothing.h"
+#include "arap.h"
 
 
 #include <iostream>
@@ -27,7 +27,8 @@ void save_mesh(at::Tensor xyz, at::Tensor faces, std::string filename) {
 }
 
 int main() {
-    std::string filename = "/data_HDD/zhuxingyu/vscode/pymesh/data/buddha.off";
+    std::string filename = "/data_HDD/zhuxingyu/vscode/py3d/data/decimated_knight.off";
+//    std::string filename = "/data_HDD/zhuxingyu/.dataset/ModelNet40/door/test/door_0110.off";
     std::ifstream mesh_file(filename);
     defer {mesh_file.close(); };
 
@@ -56,10 +57,23 @@ int main() {
     }
     std::cout << vs.size() << " " << fs.size() << std::endl;
 
-    at::Tensor xyz = torch::from_blob(vs.data(), {1, V, 3}, at::device(at::kCPU).dtype(at::ScalarType::Float));
+    at::Tensor xyz = torch::from_blob(vs.data(), {1, V, 3}, at::device(at::kCPU).dtype(at::ScalarType::Float)).contiguous();
     at::Tensor faces = torch::from_blob(fs.data(), {1, F, 3}, at::device(at::kCPU).dtype(at::ScalarType::Int));
-    at::Tensor new_xyz = implicit_laplacian_smoothing(xyz, faces, 10);
+    at::Tensor move = torch::randn({1, 3}, at::device(at::kCPU).dtype(at::ScalarType::Float));
+    at::Tensor handle = torch::randint(V, {1, 5}, at::device(at::kCPU).dtype(at::ScalarType::Int));
+
+    auto max_values = std::get<0>(xyz.max(1, true));
+    auto min_values = std::get<0>(xyz.min(1, true));
+    auto ranges = max_values - min_values;
+    xyz = (xyz - min_values) / ranges;
+
+    move = move / move.norm(2, -1, true);
+    DEBUG(move);
+
+    at::Tensor new_xyz = arap_deform(xyz, faces, handle, move);
+    DEBUG((new_xyz - xyz).sum());
+    new_xyz = (new_xyz + min_values) * ranges;
+    save_mesh(new_xyz[0], faces[0], "/data_HDD/zhuxingyu/vscode/py3d/data/out.off");
     DEBUG("heyehye");
-    save_mesh(new_xyz[0], faces[0], "/data_HDD/zhuxingyu/vscode/pymesh/data/out.off");
     return 0;
 }

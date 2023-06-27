@@ -4,8 +4,8 @@
 
 #include "laplacian_smoothing.h"
 
-#include "cuda_utils.h"
-#include "utils.h"
+#include "core/cuda_utils.h"
+#include "core/utils.h"
 
 void implicit_laplacian_smoothing_cpu(at::Tensor vertices, at::Tensor faces, float alpha, at::Tensor new_vertices);
 

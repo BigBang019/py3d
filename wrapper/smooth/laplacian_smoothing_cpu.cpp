@@ -10,8 +10,8 @@
 #include <Eigen/LU>
 #include <Eigen/SparseLU>
 
-#include "cuda_utils.h"
-#include "utils.h"
+#include "core/cuda_utils.h"
+#include "core/utils.h"
 
 typedef Eigen::Triplet<double, int> Triplet;
 /// declares a column-major sparse matrix type of double
